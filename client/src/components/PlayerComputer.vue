@@ -26,6 +26,9 @@
 
 <script>
 import {eventBus} from "../main.js"
+import { guessBestCategory } from "./best-card.js"
+
+
 export default {
   name: 'player-computer',
   props: ['cards', 'winningPlayer', 'selectedProperty', 'deckDescriptions'],
@@ -106,15 +109,23 @@ export default {
     },
     // using ratios of current card / max card values selects best property
     calculateSelectedProperty() {
-      let currentCard = this.playerTwoCards[0].playableProperties
-      Object.keys(currentCard).forEach(key => {
-        let property = currentCard[key];
-        if( this.highestRatio < property / this.maxCardValues[0].playableProperties[key]) {
-          this.highestRatio = property / this.maxCardValues[0].playableProperties[key];
-          this.computerSelectedProperty = key
-        }
-      },
-    )
+        let currentCard = this.playerTwoCards[0].playableProperties
+        
+
+        //////SEE BEST-CARD FILE///////
+      const knownBestCardValues = this.maxCardValues[0].playableProperties
+      const bestCategory = guessBestCategory(currentCard, knownBestCardValues)
+      this.computerSelectedProperty = bestCategory
+        
+        
+      //   Object.keys(currentCard).forEach(key => {
+      //   let property = currentCard[key];
+      //   if( this.highestRatio < property / this.maxCardValues[0].playableProperties[key]) {
+      //     this.highestRatio = property / this.maxCardValues[0].playableProperties[key];
+      //     this.computerSelectedProperty = key
+      //   }
+      // },
+    
     }
   }
 }
