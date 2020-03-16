@@ -18,6 +18,3 @@ MVP:
  - Model and test the game logic and then display it in the browser for a user to interact with
  - Two player game or one player and the computer
  
- To get the app working on localhost follow these instructions in the terminal:
- 
-
