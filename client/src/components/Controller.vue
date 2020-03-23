@@ -2,31 +2,35 @@
   <div>
     <div class="start-game">
       <button v-if="!start" class="start-button" v-on:click="startGame">Start Game</button>
-      <button v-if="start" class="start-button" v-on:click="mainMenu" >Main Menu</button>
+      <button v-if="start" class="start-button" v-on:click="mainMenu">Main Menu</button>
     </div>
     <div class="winning-statement">
       <h1>{{winningPlayerStatement}}</h1>
     </div>
     <div class="players-wrapper">
+      <player-one
+        v-if="start"
+        :cards="playerOneCardsDealt"
+        :winningPlayer="winningPlayer"
+        :selectedProperty="selectedProperty"
+        :deckDescriptions="deckDescriptions"
+      />
 
-      <player-one v-if="start"
-      :cards="playerOneCardsDealt"
-      :winningPlayer="winningPlayer"
-      :selectedProperty="selectedProperty"
-      :deckDescriptions="deckDescriptions"/>
+      <player-two
+        v-if="start && gameType === 'player-player'"
+        :cards="playerTwoCardsDealt"
+        :winningPlayer="winningPlayer"
+        :selectedProperty="selectedProperty"
+        :deckDescriptions="deckDescriptions"
+      />
 
-      <player-two v-if="start && gameType === 'player-player'"
-      :cards="playerTwoCardsDealt"
-      :winningPlayer="winningPlayer"
-      :selectedProperty="selectedProperty"
-      :deckDescriptions="deckDescriptions"/>
-
-      <player-computer v-if="start && gameType === 'player-computer'"
-      :cards="playerTwoCardsDealt"
-      :winningPlayer="winningPlayer"
-      :selectedProperty="selectedProperty"
-      :deckDescriptions="deckDescriptions"/>
-
+      <player-computer
+        v-if="start && gameType === 'player-computer'"
+        :cards="playerTwoCardsDealt"
+        :winningPlayer="winningPlayer"
+        :selectedProperty="selectedProperty"
+        :deckDescriptions="deckDescriptions"
+      />
     </div>
     <div class="scores">
       <div v-if="start" class="player-one-scores">
@@ -43,7 +47,6 @@
 </template>
 
 <script>
-
 import { eventBus } from "../main.js";
 import PlayersService from "../../services/PlayersService.js";
 import PlayerOne from "./PlayerOne.vue";
@@ -59,202 +62,213 @@ export default {
     "player-computer": PlayerComputer
   },
 
-  data(){
+  data() {
     return {
       playerOneCardsDealt: [],
       playerTwoCardsDealt: [],
       start: false,
       cardsUpForGrabs: [],
-      selectedProperty: '',
-      winningPlayer: '',
-      winningPlayerStatement: '',
-      gameWinner: '',
+      selectedProperty: "",
+      winningPlayer: "",
+      winningPlayerStatement: "",
+      gameWinner: "",
       playersRecords: {
         playerOneGamesWon: 0,
         playerOneGamesLost: 0,
         playerTwoGamesWon: 0,
         playerTwoGamesLost: 0
       }
-
-    }
+    };
   },
   beforeDestroy() {
-    eventBus.$off('both-cards-sent');
-    eventBus.$off('player-one-loses-game');
-    eventBus.$off('player-two-loses-game');
-    eventBus.$off('player-one-wins');
-    eventBus.$off('playertwo-property-selected');
-    eventBus.$off('playerone-property-selected');
-    eventBus.$off('player-two-wins');
-    eventBus.$off('round-drawn');
+    eventBus.$off("both-cards-sent");
+    eventBus.$off("player-one-loses-game");
+    eventBus.$off("player-two-loses-game");
+    eventBus.$off("player-one-wins");
+    eventBus.$off("playertwo-property-selected");
+    eventBus.$off("playerone-property-selected");
+    eventBus.$off("player-two-wins");
+    eventBus.$off("round-drawn");
   },
-  mounted(){
+  mounted() {
     // gets player data and shuffles and deals cards
-    this.fetchPlayers()
-    this.shuffleCards()
-    this.splitCards()
+    this.fetchPlayers();
+    this.shuffleCards();
+    this.splitCards();
 
     //listener for when a property has been selected and both cards sent up
     //puts them into a 'pot' and saves selected comparison property
-    eventBus.$on('both-cards-sent', (payload) => {
-      this.cardsUpForGrabs.unshift(payload.playerTwoCard)
-      this.cardsUpForGrabs.unshift(payload.playerOneCard)
-      this.selectedProperty = payload.property
+    eventBus.$on("both-cards-sent", payload => {
+      this.cardsUpForGrabs.unshift(payload.playerTwoCard);
+      this.cardsUpForGrabs.unshift(payload.playerOneCard);
+      this.selectedProperty = payload.property;
 
       //if statement to see if player one has won
-      if(this.cardsUpForGrabs[0].playableProperties[this.selectedProperty] > this.cardsUpForGrabs[1].playableProperties[this.selectedProperty]){
-        eventBus.$emit('player-one-wins', this.cardsUpForGrabs)
-        this.cardsUpForGrabs = []
-        this.winningPlayer = 'bothCardsShowing'
-        this.winningPlayerStatement = 'Player One Wins This Round!'
-        setTimeout(() => {this.winningPlayer = 'player-one';
-          this.winningPlayerStatement = ''
-          this.selectedProperty = ''}, 3000)
+      if (
+        this.cardsUpForGrabs[0].playableProperties[this.selectedProperty] >
+        this.cardsUpForGrabs[1].playableProperties[this.selectedProperty]
+      ) {
+        eventBus.$emit("player-one-wins", this.cardsUpForGrabs);
+        this.cardsUpForGrabs = [];
+        this.winningPlayer = "bothCardsShowing";
+        this.winningPlayerStatement = "Player One Wins This Round!";
+        setTimeout(() => {
+          this.winningPlayer = "player-one";
+          this.winningPlayerStatement = "";
+          this.selectedProperty = "";
+        }, 3000);
       }
       // else if statement for the draw
-      else if(this.cardsUpForGrabs[0].playableProperties[this.selectedProperty] === this.cardsUpForGrabs[1].playableProperties[this.selectedProperty]){
-        let lastWinningPlayer = this.winningPlayer
+      else if (
+        this.cardsUpForGrabs[0].playableProperties[this.selectedProperty] ===
+        this.cardsUpForGrabs[1].playableProperties[this.selectedProperty]
+      ) {
+        let lastWinningPlayer = this.winningPlayer;
         // emits draw and the last winning player for computer player
-        eventBus.$emit('round-drawn', lastWinningPlayer)
-        this.winningPlayer = 'bothCardsShowing'
-        this.winningPlayerStatement = "It's a draw!"
-        setTimeout(() => {this.winningPlayer = lastWinningPlayer;
-          this.winningPlayerStatement = ''
-          this.selectedProperty = ''}, 3000)
+        eventBus.$emit("round-drawn", lastWinningPlayer);
+        this.winningPlayer = "bothCardsShowing";
+        this.winningPlayerStatement = "It's a draw!";
+        setTimeout(() => {
+          this.winningPlayer = lastWinningPlayer;
+          this.winningPlayerStatement = "";
+          this.selectedProperty = "";
+        }, 3000);
       }
       //else statement for player two winning
-      else
-      {
-        eventBus.$emit('player-two-wins', this.cardsUpForGrabs)
-        this.cardsUpForGrabs = []
-        this.winningPlayer = 'bothCardsShowing'
-        this.winningPlayerStatement = 'Player Two Wins This Round!'
-        setTimeout(() => {this.winningPlayer = 'player-two';
-          this.winningPlayerStatement = '';
-          this.selectedProperty = ''}, 3000)
+      else {
+        eventBus.$emit("player-two-wins", this.cardsUpForGrabs);
+        this.cardsUpForGrabs = [];
+        this.winningPlayer = "bothCardsShowing";
+        this.winningPlayerStatement = "Player Two Wins This Round!";
+        setTimeout(() => {
+          this.winningPlayer = "player-two";
+          this.winningPlayerStatement = "";
+          this.selectedProperty = "";
+        }, 3000);
       }
-
-    } )
+    });
     //listener for when player one has no more cards left
-    eventBus.$on('player-one-loses-game', () => {
-      this.gameWinner = 'Player Two Wins The Game!'
-      this.start = false
-      this.playersRecords.playerOneGamesLost += 1
-      this.playersRecords.playerTwoGamesWon += 1
+    eventBus.$on("player-one-loses-game", () => {
+      this.gameWinner = "Player Two Wins The Game!";
+      this.start = false;
+      this.playersRecords.playerOneGamesLost += 1;
+      this.playersRecords.playerTwoGamesWon += 1;
       const updatedScores = {
         playerOneGamesLost: this.playersRecords.playerOneGamesLost,
         playerTwoGamesWon: this.playersRecords.playerTwoGamesWon
-      }
-      this.handleUpdate(updatedScores)
-      this.shuffleCards()
-      this.splitCards()
-    })
+      };
+      this.handleUpdate(updatedScores);
+      this.shuffleCards();
+      this.splitCards();
+    });
     //listener for when player two has no more cards left
-    eventBus.$on('player-two-loses-game', () => {
-      this.gameWinner = 'Player One Wins The Game!'
-      this.start = false
-      this.playersRecords.playerTwoGamesLost += 1
-      this.playersRecords.playerOneGamesWon += 1
+    eventBus.$on("player-two-loses-game", () => {
+      this.gameWinner = "Player One Wins The Game!";
+      this.start = false;
+      this.playersRecords.playerTwoGamesLost += 1;
+      this.playersRecords.playerOneGamesWon += 1;
       const updatedScores = {
         playerTwoGamesLost: this.playersRecords.playerTwoGamesLost,
         playerOneGamesWon: this.playersRecords.playerOneGamesWon
-      }
-      this.handleUpdate(updatedScores)
-      this.shuffleCards()
-      this.splitCards()
-    })
+      };
+      this.handleUpdate(updatedScores);
+      this.shuffleCards();
+      this.splitCards();
+    });
   },
 
   methods: {
-
     // gets player info from the database
     fetchPlayers() {
-      PlayersService.getPlayers()
-      .then(playersRecords => this.playersRecords = playersRecords[0])
+      PlayersService.getPlayers().then(
+        playersRecords => (this.playersRecords = playersRecords[0])
+      );
     },
 
     // sends updated player scores to the database
-    handleUpdate(updatedScores){
-      PlayersService.updatePlayers(updatedScores, this.playersRecords._id)
-      .then(result => console.log(result))
+    handleUpdate(updatedScores) {
+      PlayersService.updatePlayers(
+        updatedScores,
+        this.playersRecords._id
+      ).then(result => console.log(result));
     },
 
     startGame() {
-      this.start = true
-      this.gameWinner = ''
+      this.start = true;
+      this.gameWinner = "";
     },
 
     mainMenu() {
-      eventBus.$emit('main-menu')
-      this.playerOneCardsDealt= []
-      this.playerTwoCardsDealt= []
-      this.start= false
-      this.cardsUpForGrabs= []
-      this.selectedProperty= ''
-      this.winningPlayer= ''
+      eventBus.$emit("main-menu");
+      this.playerOneCardsDealt = [];
+      this.playerTwoCardsDealt = [];
+      this.start = false;
+      this.cardsUpForGrabs = [];
+      this.selectedProperty = "";
+      this.winningPlayer = "";
     },
 
     // splits cards and puts into players arrays
-    splitCards(){
-      const numberOfCardsPerPlayer = this.cards.length / 2
+    splitCards() {
+      const numberOfCardsPerPlayer = this.cards.length / 2;
       for (let i = 0; i < numberOfCardsPerPlayer; i++) {
-        this.playerOneCardsDealt[i] = this.cards[i]
+        this.playerOneCardsDealt[i] = this.cards[i];
       }
       for (let i = numberOfCardsPerPlayer; i < this.cards.length; i++) {
-        this.playerTwoCardsDealt[i - numberOfCardsPerPlayer] = this.cards[i]
+        this.playerTwoCardsDealt[i - numberOfCardsPerPlayer] = this.cards[i];
       }
     },
 
     // uses a random function to shuffle cards
-    shuffleCards(){
+    shuffleCards() {
       for (let i = this.cards.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [this.cards[i], this.cards[j]] = [this.cards[j], this.cards[i]];
       }
     }
-
-
-
   }
 };
 </script>
 
 <style>
-
-
 body {
-  background-color: #f5e9e1;
-  font-family: 'Bowlby One SC', cursive;
-  color: #283D3B;
+  background-color: #e6dad0;
+  font-family: "Bowlby One SC", cursive;
+  color: #283d3b;
   letter-spacing: 1px;
+}
+
+.main-header {
+  text-align: center;
+  margin-bottom: 60px;
+  font-size: 40px;
+  color: rgb(153, 48, 122);
 }
 
 .start-button {
   letter-spacing: 1px;
   border: 2px solid black;
-  background-color: #43BBF2;
+  background-color: #43bbf2;
   color: #eee;
   padding: 14px 28px;
   font-size: 16px;
   cursor: pointer;
   margin: 20px;
-  font-family: 'Bowlby One SC', cursive;
+  font-family: "Bowlby One SC", cursive;
   border-radius: 5px;
 }
 
 .start-button:hover {
   letter-spacing: 1px;
-  border: 2px solid #43BBF2;
+  border: 2px solid #43bbf2;
   background-color: #eee;
-  color: #283D3B;
+  color: #283d3b;
   box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-  font-family: 'Bowlby One SC', cursive;
+  font-family: "Bowlby One SC", cursive;
 }
-
 
 .start-game {
   text-align: center;
-
 }
 
 .players-wrapper {
@@ -286,7 +300,7 @@ body {
 .card-up {
   color: #6200ee;
   font-size: 20px;
-  background: #EFC45F;
+  background: #efc45f;
   box-shadow:
     /* Top layer shadow */ 0 1px 1px rgba(0, 0, 0, 0.15),
     /* Second layer */ 0 10px 0 -5px #197278,
@@ -294,7 +308,7 @@ body {
   width: 20vw;
   height: 30vw;
   border-radius: 10px;
-    border: 1px solid black;
+  border: 1px solid black;
 }
 
 p.not-clickable {
@@ -318,21 +332,17 @@ p.not-clickable {
 }
 
 .player-one-scores {
-
-  color: #283D3B;
+  color: #283d3b;
   place-self: center;
 }
 
 .player-one-scores > p {
-
-  margin-top: 0px
+  margin-top: 0px;
 }
 
 .player-two-scores {
-
-  background-color: orange  ;
+  background-color: orange;
   place-self: center;
-
 }
 
 .winning-statement {
@@ -340,54 +350,53 @@ p.not-clickable {
   font-size: 15px;
   height: 40px;
   place-self: center;
-  color: #C44536;
+  color: #c44536;
 }
 
-.property >span {
+.property > span {
   cursor: pointer;
   color: #1f1f1f;
-  font-family: 'Bitter', serif;
+  font-family: "Bitter", serif;
   font-weight: 600;
 }
 
-
 button:focus {
-  outline:0;
+  outline: 0;
 }
 
-.game-selected{
+.game-selected {
   text-align: center;
 }
 
-.game-selected > button{
+.game-selected > button {
   letter-spacing: 1px;
   border: 2px solid black;
-  background-color: #43BBF2;
+  background-color: #43bbf2;
   color: #eee;
   padding: 14px 28px;
   font-size: 16px;
   cursor: pointer;
   margin: 20px;
-  font-family: 'Bowlby One SC', cursive;
+  font-family: "Bowlby One SC", cursive;
   border-radius: 5px;
 }
 
-.game-selected > button:hover{
+.game-selected > button:hover {
   letter-spacing: 1px;
-  border: 2px solid #43BBF2;
+  border: 2px solid #43bbf2;
   background-color: #eee;
-  color: #283D3B;
+  color: #283d3b;
   box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-  font-family: 'Bowlby One SC', cursive;
+  font-family: "Bowlby One SC", cursive;
 }
 
 .selected > span {
-  background-color: #43BBF2;
+  background-color: #43bbf2;
   color: #1f1f1f;
-  font-family: 'Bitter', serif;
+  font-family: "Bitter", serif;
 }
 
-.deck-wrapper{
+.deck-wrapper {
   display: flex;
   list-style-type: none;
   justify-content: center;
@@ -395,44 +404,12 @@ button:focus {
   margin-top: 0px;
 }
 
-.game-type-wrapper {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  list-style-type: none;
-  justify-content: center;
-  padding-inline-start: 0px;
-  grid-gap: 50px;
-  margin-top: 20px;
-}
-
-.game-type-wrapper > li {
-  text-align: center;
-  width: 125px;
-  height: 65px;
-  border: 2px solid black;
-  padding: 10px;
-  padding-top: 20px;
-  box-shadow: 10px 10px 5px 0px;
-  background-color: #e36556;
-  border-radius: 5px;
-}
-
-.game-type-wrapper > li:hover {
+.flex-decks:hover {
   cursor: pointer;
 }
 
-.flex-decks:hover{
-  cursor: pointer;
-}
-
-.game-type-wrapper > li:first-child{
+.game-type-wrapper > li:first-child {
   place-self: end;
-}
-
-.main-header {
-  text-align: center;
-  margin-bottom: 60px;
-  font-size: 40px;
 }
 
 .title {
@@ -454,14 +431,13 @@ button:focus {
   border-radius: 12px;
 }
 
-.flex-decks > p{
- text-align: center
+.flex-decks > p {
+  text-align: center;
 }
 
 .cards-left > p {
   font-size: 20px;
   margin: 40px;
-  color: #C44536;
+  color: #c44536;
 }
-
 </style>
