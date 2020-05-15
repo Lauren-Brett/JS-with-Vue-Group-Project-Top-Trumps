@@ -1,19 +1,25 @@
 <template>
-  <div class="card-container">
-    <div v-if="winningPlayer === 'player-one' || winningPlayer === 'bothCardsShowing' || winningPlayer === ''"
-    class="card-up" >
-      <br>
-      <p class="property"><span>{{playerCards[0].name}}</span></p>
-      <img class="deck-image" :src="playerCards[0].imageURL" >
-      <p :class="selectedProperty === key ? 'selected' : 'property' "
-      v-on:click="handleClick(key)"
-      v-for="(value, key) in playerCards[0].playableProperties">
-        <span>{{key}}: {{value}}</span>
-      </p>
-    </div>
-    <div
-    v-if="winningPlayer === 'player-two'"
-    class="card-down">
+  <!-- add super-container and took cards-left out of card-container -->
+  <div class="super-container">
+    <div class="card-container">
+      <div
+        v-if="winningPlayer === 'player-one' || winningPlayer === 'bothCardsShowing' || winningPlayer === ''"
+        class="card-up"
+      >
+        <br />
+        <p class="property">
+          <span>{{playerCards[0].name}}</span>
+        </p>
+        <img class="deck-image" :src="playerCards[0].imageURL" />
+        <p
+          :class="selectedProperty === key ? 'selected' : 'property' "
+          v-on:click="handleClick(key)"
+          v-for="(value, key) in playerCards[0].playableProperties"
+        >
+          <span>{{key}}: {{value}}</span>
+        </p>
+      </div>
+      <div v-if="winningPlayer === 'player-two'" class="card-down"></div>
     </div>
     <div class="cards-left">
       <p>Cards In Deck: {{this.playerCards.length}}</p>
@@ -69,7 +75,4 @@ export default {
 </script>
 
 <style>
-
-
-
 </style>

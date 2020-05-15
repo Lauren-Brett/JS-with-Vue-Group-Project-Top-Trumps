@@ -1,6 +1,7 @@
 <template>
   <div>
     <div class="start-game">
+      <p>...let's play Top Trumps!</p>
       <button v-if="!start" class="start-button" v-on:click="startGame">Start Game</button>
       <button v-if="start" class="start-button" v-on:click="mainMenu">Main Menu</button>
     </div>
@@ -233,9 +234,9 @@ export default {
 <style>
 body {
   background-color: #e6dad0;
-  font-family: "Bowlby One SC", cursive;
+  font-family: "Bowlby One SC", cursive, sans-serif;
   color: #283d3b;
-  letter-spacing: 1px;
+  letter-spacing: 1.5px;
 }
 
 .main-header {
@@ -268,6 +269,7 @@ body {
 }
 
 .start-game {
+  margin-top: 3%;
   text-align: center;
 }
 
@@ -280,11 +282,13 @@ body {
 
 .card-container {
   place-self: center;
+  text-align: center;
+  margin-right: 0;
 }
 
 .card-down {
   color: #197278;
-  border: 1px;
+  /* border: 2px; */
   background-color: #197278;
   box-shadow:
   /* Top layer shadow */ 0 1px 1px rgba(0, 0, 0, 0.15),
@@ -294,12 +298,12 @@ body {
   height: 30vw;
   border-radius: 10px;
   user-select: none;
-  border: 1px solid black;
+  border: 1.5px solid black;
+  margin: auto;
 }
 
 .card-up {
-  color: #6200ee;
-  font-size: 20px;
+  font-size: 14px;
   background: #efc45f;
   box-shadow:
     /* Top layer shadow */ 0 1px 1px rgba(0, 0, 0, 0.15),
@@ -308,7 +312,25 @@ body {
   width: 20vw;
   height: 30vw;
   border-radius: 10px;
-  border: 1px solid black;
+  border: 1.5px solid black;
+  margin: auto;
+}
+
+.card-up > .property > span {
+  color: rgb(36, 32, 32);
+  overflow: hidden;
+  font-size: 16px;
+  margin: 2px;
+}
+
+.cards-left > p {
+  font-size: 18px;
+  margin-top: 60px;
+  margin-bottom: 10px;
+  color: #c44536;
+  font-family: "Bowlby One Regular", sans-serif;
+  font-weight: 900;
+  letter-spacing: 0.8px;
 }
 
 p.not-clickable {
@@ -329,6 +351,7 @@ p.not-clickable {
   display: grid;
   grid-template-columns: 1fr 1fr;
   text-align: center;
+  margin-top: 20px;
 }
 
 .player-one-scores {
@@ -356,8 +379,14 @@ p.not-clickable {
 .property > span {
   cursor: pointer;
   color: #1f1f1f;
-  font-family: "Bitter", serif;
-  font-weight: 600;
+  font-family: "Bowlby One Regular", sans-serif;
+  font-weight: 900;
+  letter-spacing: 0.8px;
+}
+
+.property {
+  margin-top: 2px;
+  margin-bottom: 2px;
 }
 
 button:focus {
@@ -393,9 +422,14 @@ button:focus {
 .selected > span {
   background-color: #43bbf2;
   color: #1f1f1f;
-  font-family: "Bitter", serif;
+  font-family: "Bowlby One Regular", sans-serif;
+  font-weight: 900;
+  letter-spacing: 0.8px;
 }
-
+.selected {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
 .deck-wrapper {
   display: flex;
   list-style-type: none;
@@ -435,9 +469,29 @@ button:focus {
   text-align: center;
 }
 
-.cards-left > p {
-  font-size: 20px;
-  margin: 40px;
-  color: #c44536;
+.game-type-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  list-style-type: none;
+  justify-content: center;
+  padding-inline-start: 0px;
+  grid-gap: 50px;
+  margin-top: 20px;
+}
+
+.game-type-wrapper > li {
+  text-align: center;
+  width: 200px;
+  height: 40px;
+  border: 2px solid black;
+  padding: 10px;
+  padding-top: 20px;
+  box-shadow: 10px 10px 5px 0px;
+  background-color: #e36556;
+  border-radius: 5px;
+}
+
+.game-type-wrapper > li:hover {
+  cursor: pointer;
 }
 </style>
