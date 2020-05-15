@@ -20,7 +20,7 @@
     </div>
     <div v-if="winningPlayer === '' || winningPlayer === 'player-one'" class="card-down"></div>
     <div class="cards-left">
-      <p>Cards In Deck: {{this.playerTwoCards.length}}</p>
+      <p>Current Cards In Deck: {{this.playerTwoCards.length}}</p>
     </div>
   </div>
 </template>

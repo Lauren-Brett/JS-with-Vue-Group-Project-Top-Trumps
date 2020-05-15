@@ -35,10 +35,18 @@
     </div>
     <div class="scores">
       <div v-if="start" class="player-one-scores">
-        <p>Player 1 (Wins: {{playersRecords.playerOneGamesWon}} Losses: {{playersRecords.playerOneGamesLost}})</p>
+        <label>
+          Player 1
+          <p>Games Won: {{playersRecords.playerOneGamesWon}}</p>
+          <p>Games Lost: {{playersRecords.playerOneGamesLost}}</p>
+        </label>
       </div>
       <div v-if="start" class="player-one-scores">
-        <p>Player 2 (Wins: {{playersRecords.playerTwoGamesWon}} Losses: {{playersRecords.playerTwoGamesLost}})</p>
+        <label>
+          Player 2
+          <p>Games Won: {{playersRecords.playerTwoGamesWon}}</p>
+          <p>Games Lost: {{playersRecords.playerTwoGamesLost}}</p>
+        </label>
       </div>
     </div>
     <div class="winning-statement" v-if="gameWinner !== ''">
@@ -241,7 +249,7 @@ body {
 
 .main-header {
   text-align: center;
-  margin-bottom: 60px;
+  margin-bottom: 6%;
   font-size: 40px;
   color: rgb(153, 48, 122);
 }
@@ -254,7 +262,6 @@ body {
   padding: 14px 28px;
   font-size: 16px;
   cursor: pointer;
-  margin: 20px;
   font-family: "Bowlby One SC", cursive;
   border-radius: 5px;
 }
@@ -356,23 +363,25 @@ p.not-clickable {
 
 .player-one-scores {
   color: #283d3b;
-  place-self: center;
 }
 
-.player-one-scores > p {
-  margin-top: 0px;
+.player-one-scores p {
+  margin-top: 2px;
+  margin-bottom: 2px;
+  font-family: "Bowlby One Regular", sans-serif;
+  font-weight: 900;
+  letter-spacing: 0.8px;
 }
 
 .player-two-scores {
   background-color: orange;
-  place-self: center;
 }
 
 .winning-statement {
   text-align: center;
   font-size: 15px;
   height: 40px;
-  place-self: center;
+
   color: #c44536;
 }
 
